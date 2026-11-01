@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import configparser
+import shutil
+import subprocess
 from dataclasses import replace
 from pathlib import Path
 
@@ -72,3 +74,13 @@ def test_front_end_entry_opens_windows_programs() -> None:
     entry = _read(install_front_end_entry(LAUNCHER))
     assert entry["Exec"].endswith(" --open %f")
     assert entry["MimeType"] == ";".join(WINDOWS_MIME_TYPES) + ";"
+
+
+def test_entries_pass_desktop_file_validate(app: App) -> None:
+    # Regression: an unregistered "Wine" category made app entries invalid. The validator comes with desktop-file-utils.
+    validator = shutil.which("desktop-file-validate")
+    assert validator, "desktop-file-validate is required for this test"
+    for path in (install_app_entry(app, LAUNCHER, icon=None), install_front_end_entry(LAUNCHER)):
+        result = subprocess.run([validator, str(path)], capture_output=True, text=True, check=False)  # noqa: S603  # fixed tool, our own file
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert result.stdout == ""

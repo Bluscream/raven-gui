@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QApplication
 
 from raven_gui import APP_ID, APP_NAME
 from raven_gui.ui.backend import Backend
+from raven_gui.ui.i18n import I18nContext
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,8 @@ def run_window(open_file: Path | None, launcher: list[str]) -> int:
     backend = Backend(launcher)
     engine = QQmlApplicationEngine()
     engine.warnings.connect(_log_qml_warnings)
+    i18n = I18nContext()
+    engine.rootContext().setContextObject(i18n)
     engine.setInitialProperties({"backend": backend, "openFile": str(open_file) if open_file else ""})
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "Main.qml")))
     if not engine.rootObjects():

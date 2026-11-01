@@ -69,7 +69,8 @@ def app_entry(app: App, launcher: Sequence[str], icon: Path | None) -> str:
         f"Exec={exec_line([*launcher, '--launch', app.id])}",
         f"Icon={icon if icon and icon.exists() else 'application-x-ms-dos-executable'}",
         "Terminal=false",
-        "Categories=Wine;",
+        # A registered main category keeps the entry out of the menu's catch-all section; Wine's is not registered.
+        "Categories=Utility;X-Raven;",
         f"X-Raven-Gui-App={app.id}",
     ]
     return "\n".join(lines) + "\n"

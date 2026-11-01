@@ -109,7 +109,8 @@ class Backend(QObject):
             target.unlink(missing_ok=True)
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
-            image.save(str(target), b"PNG")
+            # The format comes from the suffix: PySide's stubs and its binding disagree about the type of the format argument.
+            image.save(str(target))
         self._model.icon_updated(app.id)
         if app_entry_path(app).exists():
             install_app_entry(app, self._launcher, target)

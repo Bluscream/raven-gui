@@ -127,11 +127,15 @@ FormCard.FormCardPage {
     Kirigami.PromptDialog {
         id: snapshotDialog
         title: "Take a snapshot"
+        subtitle: "Saves the whole prefix as it is now. Unchanged files are shared with earlier snapshots."
+        preferredWidth: Kirigami.Units.gridUnit * 22
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+        onOpened: labelField.forceActiveFocus()
         onAccepted: page.backend.takeSnapshot(page.appId, labelField.text)
         Controls.TextField {
             id: labelField
             placeholderText: "Label, such as before-update"
+            onAccepted: snapshotDialog.accept()
         }
     }
 
