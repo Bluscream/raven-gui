@@ -37,7 +37,7 @@ Then start **Raven** from the menu, or `raven-gui`. Point the settings at Raven'
 
 ```text
 raven-gui                      open the window
-raven-gui --open setup.exe     open the window ready to install or run a program
+raven-gui setup.exe            open the window ready to install or run a program
 raven-gui --launch APP_ID      start an app without opening the window (what menu entries run)
 raven-gui --install-menu-entry add the front end to the menu and to Open With
 ```

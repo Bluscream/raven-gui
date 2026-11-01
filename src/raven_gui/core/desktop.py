@@ -84,7 +84,7 @@ def front_end_entry(launcher: Sequence[str]) -> str:
         f"Name={APP_NAME}",
         "GenericName=Windows program runner",
         "Comment=Install and run Windows programs with Raven",
-        f"Exec={exec_line(launcher)} --open %f",
+        f"Exec={exec_line(launcher)} %f",
         "Icon=wine",
         "Terminal=false",
         "Categories=System;Emulator;",

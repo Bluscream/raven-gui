@@ -33,19 +33,27 @@ def launch(app_id: str) -> int:
     os.execvpe(invocation.argv[0], invocation.argv, invocation.full_environment())  # noqa: S606  # argv built from the user's own app record, no shell
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Parse the command line and do what it asks."""
+def build_parser() -> argparse.ArgumentParser:
+    """Return the command line parser."""
     parser = argparse.ArgumentParser(prog="raven-gui", description="Install and run Windows programs with Raven.")
+    # A plain optional argument, so a menu entry's "%f" can expand to nothing when started without a file.
+    parser.add_argument("file", nargs="?", type=Path, help="a Windows program or installer to install or run")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--launch", metavar="APP", help="start an app by its id, without opening the window")
-    group.add_argument("--open", metavar="FILE", type=Path, help="open the window ready to install or run FILE")
+    group.add_argument("--open", metavar="FILE", type=Path, help="the same as giving FILE")
     group.add_argument(
         "--install-menu-entry",
         action="store_true",
         help="add the front end to the menu and to Open With for .exe files",
     )
     parser.add_argument("--verbose", action="store_true", help="log debug messages")
-    args = parser.parse_args(argv)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Parse the command line and do what it asks."""
+    args = build_parser().parse_args(argv)
+    file: Path | None = args.file or args.open
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO, format="%(levelname)s %(name)s: %(message)s"
     )
@@ -63,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
     # Qt loads only for the window, so --launch stays quick.
     from raven_gui.ui.application import run_window  # noqa: PLC0415
 
-    return run_window(open_file=args.open.resolve() if args.open else None, launcher=launcher_command())
+    return run_window(open_file=file.resolve() if file else None, launcher=launcher_command())
 
 
 if __name__ == "__main__":

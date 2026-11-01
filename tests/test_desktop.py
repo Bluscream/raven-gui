@@ -72,7 +72,7 @@ def test_remove_app_entry(app: App) -> None:
 
 def test_front_end_entry_opens_windows_programs() -> None:
     entry = _read(install_front_end_entry(LAUNCHER))
-    assert entry["Exec"].endswith(" --open %f")
+    assert entry["Exec"].endswith('raven-gui" %f')
     assert entry["MimeType"] == ";".join(WINDOWS_MIME_TYPES) + ";"
 
 
