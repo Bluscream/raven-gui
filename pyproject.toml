@@ -1,0 +1,94 @@
+[project]
+name = "raven-gui"
+version = "0.1.0"
+description = "A Kirigami desktop front end for Raven, the Windows compatibility layer for Linux."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+# PySide6 comes from the distribution, not from PyPI: the Kirigami QML modules are built against the
+# system Qt, and a wheel bundles a Qt of its own that cannot load them.
+dependencies = [
+  "pefile>=2024.8.26",
+  "LnkParse3>=1.6.0",
+]
+
+[project.scripts]
+raven-gui = "raven_gui.__main__:main"
+
+[dependency-groups]
+dev = [
+  "mypy>=2.4",
+  "pylnk3>=0.4.3",
+  "pytest>=9.0",
+  "ruff>=0.17",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+raven_gui = ["qml/*.qml", "data/*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "COM812",  # conflicts with the formatter
+  "CPY001",  # the LICENSE file covers the project; no per-file headers
+  "D203",    # mutually exclusive with D211, which is the style used here
+  "D213",    # mutually exclusive with D212, which is the style used here
+  "E501",    # the formatter owns line length
+  "N802",    # Qt slot and property names are camelCase so QML can call them
+  "N815",    # same, for camelCase signals declared at class scope
+  "TC001",   # with postponed annotations a TYPE_CHECKING block saves nothing and splits every import list
+  "TC003",   # same, for standard library imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/raven_gui/ui/**" = [
+  "FBT003",  # Qt signals and callbacks take their boolean arguments by position only
+]
+"tests/**" = [
+  "D103",    # a test's name says what it checks
+  "S101",    # pytest asserts are the point of a test
+  "PLR2004", # literal expected values read better than named constants in a test
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+warn_return_any = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+no_implicit_optional = true
+allow_redefinition = false
+show_error_codes = true
+mypy_path = "src"
+files = ["src", "tests"]
+
+# Fedora's PySide6 ships its .pyi stubs but not the py.typed marker that tells mypy to read them.
+[[tool.mypy.overrides]]
+module = ["PySide6", "PySide6.*"]
+follow_untyped_imports = true
+
+# Neither library ships type information and no types-* package exists for them.
+[[tool.mypy.overrides]]
+module = ["pefile", "LnkParse3", "pylnk3"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+# The virtualenv sees the system site-packages for PySide6, and with them the system's anyio plugin, which nothing here uses.
+addopts = "-ra --strict-markers -p no:anyio"
+filterwarnings = ["error"]

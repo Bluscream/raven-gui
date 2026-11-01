@@ -1,0 +1,5 @@
+#!/bin/sh
+# Runs the front end from its checkout, through the project's virtualenv, wherever this script is linked from.
+set -eu
+here=$(dirname "$(readlink -f "$0")")
+exec "$here/../.venv/bin/python" -m raven_gui "$@"
